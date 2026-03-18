@@ -148,3 +148,24 @@ git log -p --all | grep -E "AIza|sk-|Bearer [a-zA-Z0-9]{20}" | grep "^\+"
 | Credenciales Supabase | GCP Secret Manager | código, .env commiteado |
 
 En local: solo `.env` (no commiteado) copiado de `.env.example`.
+
+---
+
+## Variables de entorno — modelo de dos archivos
+
+Desde marzo 2026, el proyecto usa dos archivos separados en lugar de un `.env` monolítico:
+
+- **`.env.secrets`** — credenciales de pago (Gemini, Azure, OAuth, WhatsApp). Claude y los scripts nunca lo tocan.
+- **`.env.config`** — configuración local (URLs, puertos, flags). Scripts pueden gestionar keys automáticamente.
+
+Ver documentación completa: [variables_de_entorno.md](variables_de_entorno.md)
+
+### Pre-commit: qué detecta gitleaks en `.env.secrets`
+
+Si alguien intenta commitear `.env.secrets` con claves reales, gitleaks detecta:
+- Patrones `AIza...` (Google API keys)
+- Patrones de Azure Cognitive Services keys
+- AWS, GitHub tokens, Slack webhooks (reglas base de gitleaks)
+- Claves privadas PEM/RSA
+
+El commit queda bloqueado antes de llegar a GitHub.

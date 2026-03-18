@@ -25,3 +25,11 @@ assets/           → Imágenes, diagramas PNG/SVG
 | Manual de Usuario | `manuales/usuario-whatsapp.md` | Por crear |
 | ADR-001: 3 repos | `adr/001-tres-repositorios.md` | Por crear |
 | ADR-002: MCP dual | `adr/002-mcp-dual-pattern.md` | Por crear |
+
+## Documentos técnicos
+
+| Documento | Ubicación | Descripción |
+|-----------|-----------|-------------|
+| Seguridad Git | `docs/technical/seguridad_git.md` | 5 capas de protección de credenciales |
+| Variables de Entorno | `docs/technical/variables_de_entorno.md` | Modelo secrets/config — dos archivos separados |
+| Arquitectura del Scraper | `docs/technical/scraper_arquitectura.md` | Job local, notebooks, ChromaDB, OCR |
