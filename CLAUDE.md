@@ -1,16 +1,20 @@
 # infovoto-docs
 
-Documentación técnica y manuales de InfoVoto Perú 2026.
+Documentación global del sistema InfoVoto. No se despliega.
 
-## Estructura
-- arquitectura/ — Plan técnico, diagramas
-- api/ — Documentación de endpoints
-- manuales/ — Guías de usuario
-- runbooks/ — Procedimientos operativos
-- adr/ — Architecture Decision Records
-- assets/ — Imágenes y diagramas
+## Estructura actual
 
-## Reglas
-- SIEMPRE usar github.com-personal para SSH (NUNCA github.com)
-- Git user: CristianLazoQuispe / mecatronico.lazo@gmail.com
-- Organización: iDeepBrain
+```
+docs/
+├── deepresearch/       ← Research_01, Research_02, Debates_Arquitectura,
+│   │                     Plan_Arquitectura_Tecnica, PMBOK, diagramas SVG/PNG
+│   └── Images/
+├── entendimiento/      ← estructura_de_elecciones.md (contexto electoral peruano)
+├── technical/          ← arquitectura cross-repo, ADRs, runbooks
+├── contracts/          ← contratos de interoperabilidad entre repos
+└── user/               ← guías para usuarios finales (consultas_candidatos, planes, logistica)
+```
+
+## Regla
+Docs sobre cómo funciona un repo específico → van en `<repo>/docs/`.
+Docs sobre dominio electoral, arquitectura global o UX del sistema → van aquí.
