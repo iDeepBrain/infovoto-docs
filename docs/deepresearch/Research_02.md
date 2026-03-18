@@ -176,7 +176,7 @@ flowchart TB
         direction TB
         subgraph "Istio/Linkerd Service Mesh"
             INGRESS[Ingress Gateway<br/>mTLS + Traffic Splitting]
-            
+
             subgraph "Core Services"
                 WEBHOOK_SVC[Webhook Service<br/>3 replicas]
                 AGENT_SVC[Agent Service<br/>5 replicas]
@@ -449,18 +449,18 @@ async def handle_webhook(
     x_hub_signature_256: Optional[str] = Header(None)
 ):
     body = await request.body()
-    
+
     # Validar firma HMAC-SHA256
     if not x_hub_signature_256 or not x_hub_signature_256.startswith("sha256="):
         raise HTTPException(status_code=403, detail="Missing signature")
-    
+
     expected = hmac.new(
         APP_SECRET.encode(), body, hashlib.sha256
     ).hexdigest()
-    
+
     if not hmac.compare_digest(f"sha256={expected}", x_hub_signature_256):
         raise HTTPException(status_code=403, detail="Invalid signature")
-    
+
     data = await request.json()
     # Procesar mensajes...
     return {"status": "ok"}
@@ -509,10 +509,10 @@ def validate_phone(phone_str: str) -> dict:
         number = phonenumbers.parse(phone_str, "PE")
     except Exception:
         return {"valid": False, "reason": "Cannot parse"}
-    
+
     num_type = phonenumbers.number_type(number)
     country = phonenumbers.region_code_for_number(number)
-    
+
     return {
         "valid": phonenumbers.is_valid_number(number),
         "is_peruvian": country == "PE",
@@ -707,10 +707,10 @@ Cada mensaje se persiste **async** vía FastAPI BackgroundTasks (no bloquea la r
 async def webhook(request: Request, bg: BackgroundTasks):
     # Fast path: Redis read → LLM → respond
     response = await process_with_cache(phone, message)
-    
+
     # Async persist (non-blocking)
     bg.add_task(persist_to_postgres, phone, message, response)
-    
+
     return {"status": "ok"}
 ```
 
