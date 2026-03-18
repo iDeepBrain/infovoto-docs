@@ -30,6 +30,8 @@ assets/           → Imágenes, diagramas PNG/SVG
 
 | Documento | Ubicación | Descripción |
 |-----------|-----------|-------------|
-| Seguridad Git | `docs/technical/seguridad_git.md` | 5 capas de protección de credenciales |
+| Seguridad Git | `docs/technical/seguridad_git.md` | 6 capas de protección de credenciales en git |
+| Seguridad Aplicación | `docs/technical/seguridad_aplicacion.md` | 8 capas de seguridad runtime — código + GCP |
+| Pipeline de Evaluación | `docs/technical/eval_pipeline.md` | Stress testing + LLM-judge + 105 preguntas |
 | Variables de Entorno | `docs/technical/variables_de_entorno.md` | Modelo secrets/config — dos archivos separados |
 | Arquitectura del Scraper | `docs/technical/scraper_arquitectura.md` | Job local, notebooks, ChromaDB, OCR |
