@@ -1,0 +1,52 @@
+flowchart TB
+    subgraph "Cloud Scheduler GCP"
+        C1["Cada 4 horas\nNews Aggregation"]
+        C2["Cada 12 horas\nGovernment Sources"]
+        C3["Cada 24 horas\nHash Check PDFs"]
+        C4["Cada 1 hora\nCache Warming"]
+    end
+
+    subgraph "Cloud Run Job: infovoto-scraper"
+        MAIN["main.py --task=flag"]
+
+        subgraph "task=news"
+            N1["Parse RSS feeds\nRPP, El Comercio, Gestion"]
+            N2["Scrape HTML\nLa Encerrona"]
+            N3["Filter keywords\nelectorales"]
+            N4["Deduplicar\nfuzzy > 0.9"]
+            N5["Store PostgreSQL"]
+            N6["Generate embeddings"]
+            N7["Invalidar cache tags"]
+        end
+
+        subgraph "task=government"
+            G1["Scrape JNE portal"]
+            G2["Scrape ONPE"]
+            G3["Scrape Voto Informado"]
+            G4["Actualizar candidatos"]
+            G5["Register source"]
+        end
+
+        subgraph "task=hash-check"
+            H1["Para cada source"]
+            H2["Download + SHA-256"]
+            H3["Comparar hash"]
+            H4["Re-scrape si cambio"]
+        end
+
+        subgraph "task=cache-warm"
+            W1["Top 200 queries"]
+            W2["Generar respuestas"]
+            W3["Almacenar cache"]
+        end
+    end
+
+    C1 --> MAIN
+    C2 --> MAIN
+    C3 --> MAIN
+    C4 --> MAIN
+
+    MAIN --> N1 --> N2 --> N3 --> N4 --> N5 --> N6 --> N7
+    MAIN --> G1 & G2 & G3 --> G4 --> G5
+    MAIN --> H1 --> H2 --> H3 --> H4
+    MAIN --> W1 --> W2 --> W3

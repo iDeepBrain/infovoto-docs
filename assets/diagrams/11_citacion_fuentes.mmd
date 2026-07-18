@@ -1,0 +1,19 @@
+flowchart TB
+    QUERY["Query del usuario"] --> TOOLS["Tool calls\nsearch_candidates\ncompare_candidates"]
+    TOOLS --> RESULTS["Resultados con\nsource_id + metadata"]
+    RESULTS --> GEMINI["Gemini genera respuesta\nusando resultados\n+ source info"]
+    GEMINI --> FORMATTER["Citation Formatter"]
+
+    FORMATTER --> OUTPUT["Respuesta formateada:\n\nTexto informativo max 2000 chars\n\nFuentes:\n- Plan de Gobierno, Partido X JNE\n- Titular - RPP, 10/03/2026\nVerifica: votoinformado.jne.gob.pe"]
+
+    subgraph "Formatos por tipo"
+        F1["Plan gobierno:\nPlan de Gobierno, Partido\nCap X, pp Y-Z JNE fecha"]
+        F2["Noticia:\nTitular - Medio, fecha"]
+        F3["Oficial:\nJNE/ONPE fecha"]
+    end
+
+    subgraph "Frescura"
+        FR1["< 24h: sin indicador"]
+        FR2["1-7 dias: hace X dias"]
+        FR3["> 7 dias: advertencia"]
+    end

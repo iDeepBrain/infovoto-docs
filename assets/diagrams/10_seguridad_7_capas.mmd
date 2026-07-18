@@ -1,0 +1,15 @@
+flowchart TB
+    MSG["Mensaje entrante"] --> L1["L1: Cloudflare\nDDoS L3/L4/L7\nWAF 20 rules"]
+    L1 --> L2["L2: HMAC-SHA256\nVerificar firma Meta\nRechazar invalido = 401"]
+    L2 --> L3["L3: Rate Limiter\n30 msg/hr por telefono\n1000 msg/min global"]
+    L3 --> L4["L4: Input Validation\nMax 1000 chars\nStrip HTML/scripts"]
+    L4 --> L5["L5: LLM Guard\nPromptInjection scanner\nBanTopics + Toxicity"]
+    L5 -->|"BLOCKED"| REJECT["Respuesta generica\nno revelar razon"]
+    L5 -->|"PASS"| L6["L6: System Prompt\nHardened neutralidad\nReglas inquebrantables"]
+    L6 --> GEMINI["Gemini Flash-Lite"]
+    GEMINI --> L7["L7: Output Scanner\nEndorsement detector\nBlackout filter 5 abril\nCitation verifier"]
+    L7 -->|"CLEAN"| SEND["Enviar respuesta"]
+    L7 -->|"FLAGGED"| REFORM["Reformular neutral"]
+
+    KILL["KILL SWITCH\nPOST /admin/kill-switch\nJWT auth\nActivacion < 30 seg"]
+    KILL -.->|"Todas respuestas =\nServicio suspendido"| L1

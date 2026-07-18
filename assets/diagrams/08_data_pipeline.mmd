@@ -1,0 +1,51 @@
+flowchart TB
+    subgraph "Fuentes Externas"
+        JNE["portal.jne.gob.pe"]
+        ONPE["onpe.gob.pe"]
+        VI["votoinformado.jne.gob.pe"]
+        RPP["RPP Noticias RSS"]
+        ECOM["El Comercio RSS"]
+        NEWS_O["Gestion, La Republica\nInfobae, La Encerrona"]
+        PDFS["39 PDFs\nplanes de gobierno"]
+    end
+
+    subgraph "Cloud Run Job: infovoto-scraper"
+        WEB["Web Scraper\nhttpx + BS4\n2s delays, robots.txt"]
+        RSS["RSS Parser\nfeedparser"]
+        PDF_E["PDF Processor\nPyMuPDF"]
+        GEM_S["Gemini Flash-Lite\nExtraccion estructurada"]
+        CLEAN["Text Cleaner\nstrip HTML, normalize"]
+        HASH["SHA-256 Hash\nChange detection"]
+        REG["Source Registry\nReliability scoring"]
+        VALID["Data Validator\nPydantic schemas"]
+    end
+
+    subgraph "Storage"
+        PG[("PostgreSQL Supabase\ncandidates, proposals\nsources, scraped_docs")]
+        EMB_API["gemini-embedding-001\ntext to vector 768d"]
+        PGVEC[("pgvector\nknowledge_embeddings\nHNSW index")]
+        REDIS[("Redis Upstash\nCache invalidation")]
+    end
+
+    subgraph "Gateway: Agent Query"
+        AGENT["Agent function calling\nsearch_knowledge_base"]
+        SEM["pgvector cosine search\nthreshold 0.7"]
+        RESP["Respuesta + citaciones"]
+    end
+
+    JNE & ONPE & VI --> WEB
+    RPP & ECOM & NEWS_O --> RSS
+    PDFS --> PDF_E --> GEM_S
+
+    WEB --> CLEAN
+    RSS --> CLEAN
+    GEM_S --> CLEAN
+
+    CLEAN --> HASH --> REG --> VALID
+
+    VALID -->|"datos estructurados"| PG
+    PG --> EMB_API --> PGVEC
+    VALID -->|"invalidar cache"| REDIS
+
+    AGENT --> SEM --> PGVEC
+    SEM --> RESP

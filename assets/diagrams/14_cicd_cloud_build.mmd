@@ -1,0 +1,23 @@
+flowchart LR
+    subgraph "GitHub github.com-personal"
+        R1["infovoto-gateway\npush main"]
+        R2["infovoto-scraper\npush main"]
+    end
+
+    subgraph "Cloud Build GCP"
+        T1["Trigger #1\ngateway"]
+        T2["Trigger #2\nscraper"]
+
+        B1["1. pytest tests/\n2. docker build\n3. push Artifact Registry\n4. deploy --no-traffic"]
+        B2["1. pytest tests/\n2. docker build\n3. push Artifact Registry\n4. update job"]
+    end
+
+    subgraph "Cloud Run"
+        STAGING["Staging revision\nno traffic"]
+        PROD["Production\n100% traffic"]
+        JOB["Cloud Run Job\nupdated"]
+    end
+
+    R1 -->|"push main"| T1 --> B1 --> STAGING
+    STAGING -->|"smoke test OK"| PROD
+    R2 -->|"push main"| T2 --> B2 --> JOB

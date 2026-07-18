@@ -1,0 +1,20 @@
+flowchart TB
+    subgraph "Batch Tasks manual o one-time"
+        B1["Procesar 39 PDFs\nplanes de gobierno\n2-4 horas"]
+        B2["Pre-warm cache\n200 preguntas\n15 min"]
+        B3["Migracion DB\nAlembic upgrade head\n10 seg"]
+        B4["Backfill embeddings\nRe-generar todos\n30 min"]
+        B5["Reprocess source\nRe-scrape fuente X\n5 min"]
+    end
+
+    subgraph "PDF Pipeline detalle"
+        P1["1. Download PDF\nhttpx + retry 3x\nbackoff exponencial"]
+        P2["2. PyMuPDF\nExtraer texto"]
+        P3["3. Chunk por seccion\n500-800 tokens"]
+        P4["4. Gemini Flash-Lite\nExtraer propuestas\nstructured output"]
+        P5["5. INSERT proposals\nPostgreSQL"]
+        P6["6. Generate embeddings\ngemini-embedding-001\nvector 768d"]
+        P7["7. Register source\nSHA-256 hash\nreliability score"]
+    end
+
+    B1 --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7

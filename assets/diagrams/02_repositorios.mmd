@@ -1,0 +1,46 @@
+graph LR
+    subgraph "Repo 1: infovoto-gateway"
+        GW["src/gateway/\nFastAPI + Webhook + HMAC"]
+        AG["src/agent/\nGemini + Tools + Cache"]
+        KB["src/knowledge/\nDB + Repos + Embeddings"]
+        MIG["migrations/\nAlembic"]
+    end
+
+    subgraph "Repo 2: infovoto-scraper"
+        WEB["src/scraper/web/\nJNE, ONPE, HTML"]
+        PDF["src/scraper/pdf/\nPyMuPDF + Gemini"]
+        NEWS["src/scraper/news/\nRSS + Aggregation"]
+        MCP["src/scraper/mcp/\n5 MCP Servers dev"]
+    end
+
+    subgraph "Repo 3: infovoto-infra"
+        DC["docker-compose.yml\nOrquestador raiz"]
+        SCRIPTS["scripts/\nGCP Setup + Deploy"]
+        CB["cloudbuild/\nCloud Build configs"]
+        ENV[".env.example\nVariables entorno"]
+    end
+
+    subgraph "Repo 4: infovoto-gradio"
+        APP["app.py\nGradio ChatInterface"]
+        DOCK["Dockerfile\npython:3.12-slim"]
+    end
+
+    subgraph "Repo 5: infovoto-docs"
+        ARCH["arquitectura/\nPlan + Diagramas"]
+        API["api/\nEndpoints + Payloads"]
+        RUN["runbooks/\nDeploy + Emergencias"]
+        ADR["adr/\nDecision Records"]
+    end
+
+    subgraph "Repo 6: infovoto-planning"
+        TODO["todo/\nSemana actual"]
+        BACKLOG["backlog/\nPor priorizar"]
+        INPROG["in-progress/\nEn desarrollo"]
+        DONE["done/\nCompletadas"]
+    end
+
+    GW -->|"Cloud Build\nTrigger #1"| CR1["Cloud Run\nService"]
+    WEB -->|"Cloud Build\nTrigger #2"| CR2["Cloud Run\nJob"]
+    DC -->|"docker compose up"| LOCAL["Dev Local\nlocalhost:8080"]
+    APP -->|"HTTP interno\nred infovoto"| GW
+    APP -->|"localhost:7860"| DEMO["Demo Web\nsin WhatsApp"]

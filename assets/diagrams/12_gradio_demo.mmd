@@ -1,0 +1,15 @@
+flowchart LR
+    BROWSER["Browser\nlocalhost:2860"] --> GRADIO["Gradio ChatInterface\ninfovoto-gradio/app.py"]
+    GRADIO -->|"POST /webhook/test\nsin HMAC required"| GW["Gateway\ngateway:8080"]
+    GW --> AGENT["Agent\nGemini Flash-Lite"]
+    AGENT --> GEMINI["Gemini API"]
+    GW --> REDIS[("Redis\nredis:6379")]
+    GW --> PG[("PostgreSQL\npostgres:5432")]
+
+    subgraph "Docker Network: infovoto"
+        GRADIO
+        GW
+        AGENT
+        REDIS
+        PG
+    end

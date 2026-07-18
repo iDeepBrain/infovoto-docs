@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph "make up desde infovoto-infra"
+        subgraph "Red: infovoto bridge"
+            GW["gateway\nlocalhost:2080 → 8080\nbuild: ../infovoto-gateway"]
+            SC["scraper\nprofile: scraper\nbuild: ../infovoto-scraper"]
+            GRADIO["gradio\nlocalhost:2860 → 7860\nbuild: ../infovoto-gradio"]
+            REDIS["redis\nlocalhost:2379 → 6379\nredis:7-alpine"]
+            PG["postgres\nlocalhost:2432 → 5432\npgvector/pgvector:pg16"]
+        end
+    end
+
+    GW -->|"depends_on healthy"| REDIS
+    GW -->|"depends_on healthy"| PG
+    SC -->|"depends_on healthy"| PG
+    GRADIO -->|"depends_on"| GW
+
+    USER["Developer"] -->|"make up\nmake test\nmake logs"| MAKEFILE["Makefile\ninfovoto-infra/"]
+    MAKEFILE --> GW & GRADIO & SC

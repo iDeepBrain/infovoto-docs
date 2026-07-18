@@ -1,0 +1,31 @@
+gantt
+    title InfoVoto Peru 2026 - Timeline
+    dateFormat  YYYY-MM-DD
+    axisFormat  %d/%m
+
+    section Sem 1: Foundation
+    Repos + Docker + GCP           :s1a, 2026-03-08, 2d
+    Gateway + Webhook + Deploy     :s1b, after s1a, 2d
+    Knowledge Schema + CRUD        :s1c, after s1b, 1d
+    Agent + Cache + Gradio E2E     :s1d, after s1c, 2d
+
+    section Sem 2: Data
+    PDF Processor top 10           :s2a, 2026-03-15, 2d
+    Web Scraper + News             :s2b, after s2a, 2d
+    Embeddings + Semantic          :s2c, after s2b, 1d
+    Semantic Cache + Pre-warm      :s2d, after s2c, 1d
+    Integration + Soft Launch      :s2e, after s2d, 1d
+
+    section Sem 3: Hardening
+    LLM Guard + Red Team           :s3a, 2026-03-22, 2d
+    Load Test                      :s3b, after s3a, 1d
+    39 Planes restantes            :s3c, after s3b, 1d
+    LANZAMIENTO PUBLICO            :crit, s3d, 2026-03-25, 3d
+
+    section Sem 4: Scale
+    Feedback + Tuning              :s4a, 2026-03-29, 5d
+    Broadcasts                     :s4b, after s4a, 2d
+
+    section Sem 5: Elecciones
+    Blackout encuestas             :crit, s5a, 2026-04-05, 1d
+    DIA DE ELECCION                :crit, s5b, 2026-04-12, 1d

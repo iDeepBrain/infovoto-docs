@@ -1,0 +1,33 @@
+flowchart TB
+    U["👤 Citizen<br/>web · WhatsApp"]
+
+    U --> WEB["infovoto-web<br/>Next.js 14 · voti.pe<br/>Cloud Run"]
+    WEB --> GW["infovoto-gateway · FastAPI<br/>Orchestrator — 2-pass agent<br/>Cloud Run"]
+
+    subgraph AGENT["Agent pipeline · Gemini (hexagonal: Gemini/Claude/OpenAI)"]
+      direction LR
+      FR["fast-route<br/>regex"] --> R["Router<br/>gemini-2.5-flash-lite"] --> S["Synthesizer<br/>gemini-2.0-flash"]
+    end
+    GW --> AGENT
+
+    GW --> MCP["infovoto-mcp · FastMCP<br/>6 servers: perfiles · planes · logistica<br/>proceso · debates · demo<br/>Cloud Run 'mcp-server'"]
+    GW --> RAG[("ChromaDB<br/>candidate-profile RAG")]
+    GW --> PG[("PostgreSQL + pgvector<br/>Supabase")]
+    GW --> RD[("Redis<br/>Upstash — cache/session/rate-limit")]
+    MCP --> PG
+
+    subgraph OFFLINE["Offline / batch — local"]
+      direction LR
+      SCR["infovoto-scraper<br/>JNE · ONPE → DB"]
+      DA["infovoto-data-analysis<br/>daily metrics + LLM judge"]
+      GR["infovoto-gradio<br/>local test UI"]
+    end
+    SCR --> PG
+    SCR --> RAG
+    PG --> DA
+    GR -.-> GW
+
+    classDef svc fill:#1e293b,stroke:#38bdf8,color:#e2e8f0;
+    classDef store fill:#0f172a,stroke:#a78bfa,color:#e2e8f0;
+    class WEB,GW,MCP,SCR,DA,GR svc;
+    class RAG,PG,RD store;

@@ -1,0 +1,19 @@
+flowchart TB
+    Q["Query del usuario"] --> NORM["Normalizar\nlowercase, strip\nremove accents"]
+    NORM --> HASH["MD5 hash del\nquery normalizado"]
+
+    HASH --> L1{"CAPA 1: Exact Match\nRedis GET cache:exact:hash\nTTL 24h | < 2ms"}
+    L1 -->|"HIT"| R1["Respuesta exacta\ndel cache"]
+    L1 -->|"MISS"| EMB["gemini-embedding-001\nquery to vector 768d"]
+
+    EMB --> L2{"CAPA 2: Semantic Match\ncosine_similarity >= 0.92\n< 50ms"}
+    L2 -->|"HIT"| R2["Respuesta\nsemantica similar"]
+    L2 -->|"MISS"| L3["CAPA 3: Gemini\nFlash-Lite\n500-1500ms"]
+
+    L3 --> STORE["Almacenar en\nL1 exact + L2 semantic"]
+    STORE --> R3["Respuesta\ngenerada"]
+
+    subgraph "Invalidacion por Tags"
+        SCRAPER["Scraper actualiza\ndatos de Keiko"]
+        SCRAPER --> DEL["DELETE\ncache:tag:candidato:keiko:*"]
+    end

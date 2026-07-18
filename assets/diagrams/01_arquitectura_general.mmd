@@ -1,0 +1,97 @@
+flowchart TB
+    subgraph "Internet"
+        USER["Usuario WhatsApp +51"]
+        META["Meta Cloud API"]
+        ADMIN_USER["Admin"]
+    end
+
+    subgraph "Edge — Cloudflare"
+        CF["Cloudflare Pro $20/mo\nDDoS + WAF + DNS"]
+    end
+
+    subgraph "Cloud Run Service — infovoto-gateway"
+        direction TB
+
+        subgraph "Gateway Layer ONLINE"
+            WEBHOOK["FastAPI Webhook Handler"]
+            HMAC["HMAC-SHA256 Verify"]
+            RL["Rate Limiter 30/hr per phone"]
+            PHONE["Phone Validator +51"]
+        end
+
+        subgraph "Agent Layer ONLINE"
+            GUARD_IN["LLM Guard Input"]
+            CACHE["Cache 3 Capas\nExact - Semantic - LLM"]
+            AGENT["Gemini 2.5 Flash-Lite\n+ Function Calling"]
+            CITE["Citation Formatter"]
+            GUARD_OUT["Output Scanner\n+ Blackout Filter"]
+        end
+
+        subgraph "Knowledge Layer ONLINE"
+            REPOS["Repositories\ncandidates, proposals, sources"]
+            EMBED_SEARCH["pgvector Semantic Search"]
+            ADMIN_API["Admin API\nKill Switch + Stats"]
+        end
+
+        subgraph "Async Tasks"
+            PERSIST["Persist Message"]
+            SESSION["Update Session"]
+            CACHE_STORE["Store in Cache"]
+            ANALYTICS["Log Analytics"]
+        end
+    end
+
+    subgraph "Cloud Run Job — infovoto-scraper"
+        direction TB
+        subgraph "Background Tasks"
+            NEWS_SCRAPE["News Aggregator\nRSS + HTML cada 4h"]
+            GOV_SCRAPE["Government Scraper\nJNE + ONPE cada 12h"]
+            HASH_CHECK["Hash Check\nSHA-256 cada 24h"]
+        end
+
+        subgraph "Batch Tasks"
+            PDF_PROC["PDF Processor\n39 planes de gobierno"]
+            EMBED_GEN["Embedding Generator\ngemini-embedding-001"]
+            CACHE_WARM["Cache Pre-warming\n200 preguntas"]
+        end
+
+        subgraph "MCP Servers DEV ONLY"
+            MCP1["Web Scraper"]
+            MCP2["PDF Processor"]
+            MCP3["News Aggregator"]
+            MCP4["Source Registry"]
+            MCP5["Knowledge Base"]
+        end
+    end
+
+    subgraph "Data Layer"
+        REDIS[("Upstash Redis\nCache + Sessions")]
+        PG[("Supabase PostgreSQL\npgvector + 11 tablas")]
+        GEMINI_API["Gemini Flash-Lite API"]
+        EMBED_API["gemini-embedding-001"]
+    end
+
+    subgraph "Dev Local — infovoto-infra"
+        COMPOSE["Docker Compose\nRed compartida infovoto"]
+        GRADIO["Gradio Demo\nlocalhost:7860"]
+    end
+
+    USER <-->|"WhatsApp"| META
+    META -->|"POST /webhook"| CF --> WEBHOOK
+    WEBHOOK --> HMAC --> RL --> PHONE
+    PHONE --> GUARD_IN --> CACHE
+    CACHE -->|"MISS"| AGENT
+    AGENT --> GEMINI_API
+    AGENT --> REPOS --> PG
+    AGENT --> EMBED_SEARCH --> PG
+    AGENT --> CITE --> GUARD_OUT
+    GUARD_OUT -->|"Response"| META
+    CACHE <--> REDIS
+    AGENT --> PERSIST & SESSION & CACHE_STORE & ANALYTICS
+
+    NEWS_SCRAPE & GOV_SCRAPE --> PG
+    PDF_PROC --> EMBED_GEN --> PG
+    EMBED_GEN --> EMBED_API
+
+    GRADIO -->|"POST /webhook/test"| WEBHOOK
+    ADMIN_USER --> ADMIN_API

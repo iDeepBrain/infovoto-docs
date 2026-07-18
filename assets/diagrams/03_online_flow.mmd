@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant U as Usuario WhatsApp
+    participant M as Meta Cloud API
+    participant GW as Gateway FastAPI
+    participant C as Cache Redis
+    participant AG as Agent Gemini
+    participant DB as PostgreSQL
+
+    U->>M: Que propone Keiko en educacion?
+    M->>GW: POST /webhook + X-Hub-Signature-256
+
+    Note over GW: HMAC verify < 1ms
+    Note over GW: Rate limit check < 2ms
+    Note over GW: Phone validate < 1ms
+    Note over GW: LLM Guard input < 10ms
+
+    GW->>C: Exact cache lookup < 2ms
+
+    alt Cache HIT
+        C-->>GW: Respuesta cacheada
+    else Cache MISS
+        GW->>C: Semantic cache < 50ms
+        alt Semantic HIT similarity >= 0.92
+            C-->>GW: Respuesta similar
+        else Full MISS
+            GW->>C: Get session ultimos 20 msgs
+            GW->>AG: Gemini generate + function calling
+            AG->>DB: search_candidates Keiko educacion
+            DB-->>AG: Propuestas de educacion
+            AG-->>GW: Respuesta + fuentes
+        end
+    end
+
+    Note over GW: Citation formatter
+    Note over GW: Output scanner
+    GW-->>M: Respuesta con citaciones
+    M-->>U: Mensaje WhatsApp
+
+    Note over GW: ASYNC: persist, session, cache

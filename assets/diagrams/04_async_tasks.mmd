@@ -1,0 +1,13 @@
+flowchart LR
+    RESP["Response enviada\nal usuario"] --> BG["FastAPI\nBackgroundTasks"]
+
+    BG --> T1["Persist message\nINSERT messages\npartitioned by month"]
+    BG --> T2["Update session\nRedis LPUSH + LTRIM 20"]
+    BG --> T3["Cache store\nexact + semantic"]
+    BG --> T4["Update user\nlast_seen_at++\nmessage_count++"]
+    BG --> T5["Analytics log\ntokens, latencia, cache hit"]
+    BG --> T6["Cache invalidation\nsi scraper actualizo"]
+
+    T1 & T4 --> PG[("PostgreSQL")]
+    T2 & T3 --> REDIS[("Redis")]
+    T5 --> LOG["Cloud Logging"]

@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph "Codigo compartido"
+        FN["tools/search_candidates.py\nasync def search_candidates\nquery, party, region"]
+    end
+
+    subgraph "DEV: MCP Server"
+        MCP["mcp/server.py\n@mcp.tool decorator"]
+        CC["Claude Code\nMCP Inspector"]
+    end
+
+    subgraph "PROD: Gemini FC"
+        SCHEMA["tools/gemini_schemas.py\nFunctionDeclaration"]
+        GEM["Gemini API\nfunction_calling"]
+    end
+
+    FN --> MCP --> CC
+    FN --> SCHEMA --> GEM
