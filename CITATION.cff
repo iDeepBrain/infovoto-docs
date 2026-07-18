@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: "If you use InfoVoto / Voti in your work, please cite it as below."
+title: "InfoVoto Perú 2026 (\"Voti\") — a responsible-AI citizen electoral assistant"
+abstract: >-
+  Voti is an open, non-partisan AI assistant that helps Peruvian citizens vote
+  informed, grounded in official electoral data (JNE, ONPE) and designed never to
+  issue a voting recommendation. It combines a latency-budgeted two-pass LLM agent,
+  Model Context Protocol (MCP) tool orchestration over six electoral-domain servers,
+  retrieval-augmented generation over candidate profiles, and a responsible-AI output
+  filter, deployed on Google Cloud Run.
+type: software
+authors:
+  - family-names: "Lazo Quispe"
+    given-names: "Cristian"
+    website: "https://github.com/CristianLazoQuispe"
+repository-code: "https://github.com/iDeepBrain/infovoto-docs"
+url: "https://voti.pe"
+date-released: 2026-07-18
+license: MIT
+keywords:
+  - responsible AI
+  - LLM agent
+  - Model Context Protocol
+  - MCP
+  - retrieval-augmented generation
+  - agent orchestration
+  - civic technology
+  - elections
+  - Peru
+  - Gemini
